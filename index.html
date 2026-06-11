@@ -1001,6 +1001,295 @@
     .survival-rate { font-size: 40px; }
   }
 
+
+  /* ============ COMPACT INTERACTION SIZE OVERRIDES ============ */
+  /* 버튼이 카드/패널 전체 폭을 차지하지 않고 글자 크기에 맞춰 보이도록 조정 */
+  .btn-primary,
+  .btn-secondary,
+  .boss-attack-btn,
+  .analyze-btn,
+  .clear-boss {
+    width: fit-content;
+    min-width: auto;
+    padding: 9px 16px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 10px 18px;
+  }
+
+  .boss-attack-btn {
+    margin-top: 2px;
+  }
+
+  .analyze-btn {
+    margin-top: 8px;
+  }
+
+  .skill-tag {
+    padding: 3px 9px;
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .boss-rank,
+  .difficulty-badge,
+  .selected-rank-badge {
+    padding: 4px 9px;
+    width: fit-content;
+    white-space: nowrap;
+  }
+
+  .hero-cta {
+    gap: 10px;
+  }
+
+  .boss-card-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .analysis-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .analysis-panel .form-group,
+  .analysis-panel .engine-note {
+    width: 100%;
+  }
+
+  @media (max-width: 700px) {
+    .btn-primary,
+    .btn-secondary,
+    .boss-attack-btn,
+    .analyze-btn,
+    .clear-boss {
+      padding: 8px 13px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+    }
+  }
+
+
+
+  /* ============ INTERVIEW BOSS BATTLE MODE ============ */
+  .battle-arena {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: stretch;
+  }
+  @media (max-width: 900px) { .battle-arena { grid-template-columns: 1fr; } }
+
+  .battle-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    backdrop-filter: blur(10px);
+  }
+  .battle-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,41,82,0.06), transparent 55%);
+    pointer-events: none;
+  }
+  .boss-battle-name {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 5vw, 56px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    color: var(--neon-red);
+    text-shadow: 0 0 28px rgba(255,41,82,0.35);
+    margin: 12px 0 6px;
+  }
+  .battle-subtext {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    line-height: 1.7;
+  }
+  .battle-hp-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin: 24px 0 8px;
+  }
+  .battle-hp-track {
+    height: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--dim);
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+  }
+  .battle-hp-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--neon-red), #ff7a29);
+    transition: width 0.45s ease;
+    box-shadow: 0 0 18px rgba(255,41,82,0.45);
+  }
+  .battle-question-card {
+    margin-top: 22px;
+    padding: 18px;
+    background: rgba(0,212,255,0.04);
+    border: 1px solid rgba(0,212,255,0.22);
+  }
+  .battle-phase {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--neon-blue);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .battle-question {
+    font-size: 18px;
+    line-height: 1.65;
+    font-weight: 700;
+  }
+  .battle-answer {
+    width: 100%;
+    min-height: 150px;
+    margin-top: 18px;
+    background: var(--surface2);
+    border: 1px solid var(--dim);
+    color: var(--text);
+    padding: 14px;
+    font-family: 'Noto Sans KR', 'Exo 2', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    resize: vertical;
+    outline: none;
+  }
+  .battle-answer:focus {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 0 1px rgba(0,212,255,0.2);
+  }
+  .battle-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .battle-btn {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 9px 15px;
+    border: 1px solid var(--dim);
+    background: transparent;
+    color: var(--muted);
+    cursor: crosshair;
+    transition: all 0.2s;
+    width: fit-content;
+  }
+  .battle-btn.primary {
+    background: var(--neon-red);
+    border-color: var(--neon-red);
+    color: #fff;
+    box-shadow: 0 0 18px rgba(255,41,82,0.25);
+  }
+  .battle-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0,212,255,0.18);
+  }
+  .battle-btn.primary:hover:not(:disabled) { background: #fff; color: var(--neon-red); border-color: #fff; }
+  .battle-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .battle-log {
+    min-height: 390px;
+    max-height: 560px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 4px;
+  }
+  .log-line {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-left: 2px solid var(--dim);
+    color: var(--text);
+  }
+  .log-line.good { border-left-color: var(--neon-green); color: var(--neon-green); }
+  .log-line.mid { border-left-color: var(--neon-gold); color: var(--neon-gold); }
+  .log-line.bad { border-left-color: var(--neon-red); color: var(--neon-red); }
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .score-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 12px;
+  }
+  .score-box span {
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .score-box strong {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    color: var(--neon-blue);
+  }
+  .battle-final-result {
+    display: none;
+    margin-top: 18px;
+    padding: 18px;
+    border: 1px solid var(--neon-blue);
+    background: rgba(0,212,255,0.04);
+  }
+  .final-score-big {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 900;
+    color: var(--neon-blue);
+    line-height: 1;
+    margin: 10px 0;
+  }
+  .final-rank {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    color: var(--neon-gold);
+    letter-spacing: 2px;
+  }
+  .final-comment {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+    opacity: 0.88;
+    margin-top: 10px;
+  }
+
 </style>
 </head>
 <body>
@@ -1045,6 +1334,7 @@
     <div class="hero-cta">
       <a href="#bosses" class="btn-primary">보스 선택</a>
       <a href="#analysis" class="btn-secondary">분석 시작</a>
+      <a href="#interviewBattle" class="btn-secondary">면접 보스전</a>
     </div>
     <div class="hp-bar-deco">
       <div class="hp-label">
@@ -1086,8 +1376,8 @@
       </div>
       <div class="step-card">
         <div class="step-number">04</div>
-        <div class="step-title">전투 전략</div>
-        <p class="step-desc">맞춤형 전투 계획을 받으세요: 예상 질문, 스킬 갭, 그리고 빠른 성장 경로까지 제시합니다.</p>
+        <div class="step-title">면접 전투</div>
+        <p class="step-desc">보스가 면접 질문을 던지면 답변을 입력하세요. 답변의 구체성에 따라 보스 HP가 깎입니다.</p>
       </div>
     </div>
   </div>
@@ -1194,6 +1484,65 @@
 
         <div class="result-content" id="resultContent">
           <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- INTERVIEW BOSS BATTLE -->
+  <div class="section fade-in-section" id="interviewBattle">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-title">면접 <span>보스전</span></h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="battle-arena">
+      <div class="battle-panel">
+        <div class="panel-label">실전 면접 전투 모드</div>
+        <div class="battle-subtext">선택한 보스가 면접 질문을 냅니다. 답변에 경험, 행동, 결과, 배운 점이 들어갈수록 더 큰 데미지가 들어갑니다.</div>
+        <div class="boss-battle-name" id="battleBossName">NO TARGET</div>
+        <div class="battle-subtext" id="battleBossInfo">먼저 보스를 선택한 뒤 전투를 시작하세요.</div>
+
+        <div class="battle-hp-label">
+          <span>BOSS HP</span>
+          <span id="bossHpText">100 / 100</span>
+        </div>
+        <div class="battle-hp-track"><div class="battle-hp-fill" id="bossHpFill"></div></div>
+
+        <div class="score-grid">
+          <div class="score-box"><span>ROUND</span><strong id="battleRound">0</strong></div>
+          <div class="score-box"><span>DMG</span><strong id="lastDamage">0</strong></div>
+          <div class="score-box"><span>GRADE</span><strong id="lastGrade">-</strong></div>
+          <div class="score-box"><span>TOTAL</span><strong id="finalScoreMini">-</strong></div>
+        </div>
+
+        <div class="battle-question-card">
+          <div class="battle-phase" id="battlePhase">PHASE 00</div>
+          <div class="battle-question" id="battleQuestion">보스전을 시작하면 질문이 나타납니다.</div>
+        </div>
+
+        <textarea class="battle-answer" id="battleAnswer" placeholder="여기에 면접 답변을 작성하세요. 예: 어떤 상황에서, 무엇을 했고, 결과가 어땠는지까지 적으면 데미지가 더 잘 들어갑니다."></textarea>
+
+        <div class="battle-controls">
+          <button class="battle-btn primary" onclick="startInterviewBattle()">전투 시작</button>
+          <button class="battle-btn" id="attackBtn" onclick="submitBattleAnswer()" disabled>답변 공격</button>
+          <button class="battle-btn" onclick="resetInterviewBattle()">리셋</button>
+        </div>
+      </div>
+
+      <div class="battle-panel">
+        <div class="panel-label">전투 로그</div>
+        <div class="battle-log" id="battleLog">
+          <div class="log-line">[SYSTEM] 보스전 대기 중. 보스를 선택하고 전투 시작을 누르세요.</div>
+          <div class="log-line">[TIP] 좋은 답변 = 상황 + 행동 + 결과 + 배운 점 + 직무 연결.</div>
+        </div>
+        <div class="battle-final-result" id="battleFinalResult">
+          <div class="battle-subtext">INTERVIEW RESULT</div>
+          <div class="final-score-big" id="finalInterviewScore">0</div>
+          <div class="final-rank" id="finalInterviewRank">-</div>
+          <div class="final-comment" id="finalInterviewComment"></div>
         </div>
       </div>
     </div>
@@ -1643,6 +1992,240 @@ function renderResult(boss, r) {
   }, 100);
 
   showNotif(`분석 완료 · 생존 확률: ${r.survivalRate}%`);
+}
+
+
+// ============ INTERVIEW BOSS BATTLE MODE ============
+const INTERVIEW_QUESTIONS = {
+  tech: [
+    '가장 완성도 있게 진행한 프로젝트 하나를 설명해 주세요. 본인의 역할은 무엇이었나요?',
+    '문제가 발생했을 때 원인을 어떻게 찾고 해결했나요?',
+    '새로운 기술을 짧은 시간 안에 익혀야 한다면 어떻게 학습하나요?',
+    '팀 프로젝트에서 의견 충돌이 생겼을 때 어떻게 해결했나요?'
+  ],
+  ai: [
+    'AI 서비스를 만들 때 성능과 안전성 중 무엇을 더 중요하게 보나요?',
+    '데이터가 부족하거나 품질이 낮을 때 어떻게 대응하겠습니까?',
+    '본인이 만든 AI/데이터 관련 프로젝트가 있다면 문제 정의부터 설명해 주세요.',
+    'AI 기술을 사용할 때 윤리적으로 조심해야 할 점은 무엇이라고 생각하나요?'
+  ],
+  consulting: [
+    '처음 보는 문제를 받았을 때 어떤 순서로 구조화하겠습니까?',
+    '팀을 설득해야 했던 경험을 말해 주세요.',
+    '제한된 정보만 있을 때 어떻게 의사결정을 하겠습니까?',
+    '실패한 프로젝트에서 배운 점은 무엇인가요?'
+  ],
+  public: [
+    '공공성을 고려한 의사결정이 왜 중요하다고 생각하나요?',
+    '규정과 효율이 충돌할 때 어떻게 판단하겠습니까?',
+    '민원이나 갈등 상황을 어떻게 대응하겠습니까?',
+    '조직에서 책임감 있게 행동한 경험을 말해 주세요.'
+  ],
+  general: [
+    '우리 회사에 지원한 이유를 본인의 경험과 연결해서 설명해 주세요.',
+    '본인의 강점 하나를 실제 경험으로 증명해 주세요.',
+    '가장 힘들었던 문제와 해결 과정을 말해 주세요.',
+    '입사 후 어떤 방식으로 성장하고 싶나요?'
+  ]
+};
+
+let battleState = {
+  active: false,
+  boss: null,
+  hp: 100,
+  maxHp: 100,
+  round: 0,
+  maxRounds: 4,
+  totalScore: 0,
+  scores: [],
+  grades: [],
+  questions: []
+};
+
+function getBattleBoss() {
+  const bossIdOverride = document.getElementById('bossSelect')?.value;
+  return selectedBoss || BOSSES.find(b => b.id === bossIdOverride) || null;
+}
+
+function getQuestionSet(boss) {
+  if (!boss) return INTERVIEW_QUESTIONS.general;
+  if (boss.industry.includes('AI')) return INTERVIEW_QUESTIONS.ai;
+  if (boss.industry.includes('컨설팅')) return INTERVIEW_QUESTIONS.consulting;
+  if (boss.industry.includes('공공')) return INTERVIEW_QUESTIONS.public;
+  if (boss.industry.includes('테크') || boss.industry.includes('클라우드') || boss.industry.includes('핀테크')) return INTERVIEW_QUESTIONS.tech;
+  return INTERVIEW_QUESTIONS.general;
+}
+
+function startInterviewBattle() {
+  const boss = getBattleBoss();
+  if (!boss) {
+    showNotif('먼저 보스를 선택하세요');
+    document.getElementById('bosses').scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+  const questions = getQuestionSet(boss);
+  battleState = {
+    active: true,
+    boss,
+    hp: 100,
+    maxHp: 100,
+    round: 0,
+    maxRounds: questions.length,
+    totalScore: 0,
+    scores: [],
+    grades: [],
+    questions
+  };
+  document.getElementById('battleBossName').textContent = boss.short;
+  document.getElementById('battleBossInfo').textContent = `${boss.name} · ${boss.industry} · 난이도 ${({'easy':'쉬움','normal':'보통','hard':'어려움','nightmare':'악몽'}[boss.rank])}`;
+  document.getElementById('attackBtn').disabled = false;
+  document.getElementById('battleAnswer').value = '';
+  document.getElementById('battleFinalResult').style.display = 'none';
+  document.getElementById('finalScoreMini').textContent = '-';
+  document.getElementById('battleLog').innerHTML = `<div class="log-line bad">[BOSS APPEARED] ${boss.name}이(가) 면접장에 등장했다.</div><div class="log-line">[RULE] 보스 HP는 압박감 연출입니다. 모든 질문이 끝난 뒤 총점으로 면접 결과가 결정됩니다.</div>`;
+  updateBattleUI();
+  nextBattleQuestion();
+  showNotif('면접 보스전 시작');
+}
+
+function resetInterviewBattle() {
+  battleState.active = false;
+  battleState.hp = 100;
+  battleState.round = 0;
+  battleState.totalScore = 0;
+  battleState.scores = [];
+  battleState.grades = [];
+  document.getElementById('battleBossName').textContent = 'NO TARGET';
+  document.getElementById('battleBossInfo').textContent = '먼저 보스를 선택한 뒤 전투를 시작하세요.';
+  document.getElementById('battleQuestion').textContent = '보스전을 시작하면 질문이 나타납니다.';
+  document.getElementById('battlePhase').textContent = 'PHASE 00';
+  document.getElementById('battleAnswer').value = '';
+  document.getElementById('attackBtn').disabled = true;
+  document.getElementById('finalScoreMini').textContent = '-';
+  document.getElementById('battleFinalResult').style.display = 'none';
+  document.getElementById('battleLog').innerHTML = '<div class="log-line">[SYSTEM] 보스전 대기 중. 보스를 선택하고 전투 시작을 누르세요.</div><div class="log-line">[TIP] 좋은 답변 = 상황 + 행동 + 결과 + 배운 점 + 직무 연결.</div>';
+  updateBattleUI();
+}
+
+function nextBattleQuestion() {
+  if (!battleState.active) return;
+  const q = battleState.questions[battleState.round];
+  document.getElementById('battlePhase').textContent = `PHASE ${String(battleState.round + 1).padStart(2, '0')} / ${String(battleState.maxRounds).padStart(2, '0')}`;
+  document.getElementById('battleQuestion').textContent = q || '면접이 종료되었습니다. 최종 점수를 확인하세요.';
+}
+
+function submitBattleAnswer() {
+  if (!battleState.active) return;
+  const answer = document.getElementById('battleAnswer').value.trim();
+  if (answer.length < 20) {
+    showNotif('답변이 너무 짧습니다');
+    addBattleLog('[MISS] 답변이 너무 짧아 공격이 빗나갔다. 조금 더 구체적으로 작성하세요.', 'bad');
+    return;
+  }
+
+  const result = scoreBattleAnswer(answer, battleState.boss);
+  battleState.hp = clamp(battleState.hp - result.damage, 0, battleState.maxHp);
+  battleState.scores.push(result.score);
+  battleState.grades.push(result.grade);
+  battleState.totalScore = Math.round(battleState.scores.reduce((a, b) => a + b, 0) / battleState.scores.length);
+  battleState.round += 1;
+
+  document.getElementById('lastDamage').textContent = result.damage;
+  document.getElementById('lastGrade').textContent = result.grade;
+  document.getElementById('finalScoreMini').textContent = battleState.totalScore;
+  addBattleLog(`[ANSWER ${battleState.round}/${battleState.maxRounds}] ${result.grade} 답변 · ${result.score}점 · 보스 HP ${result.damage} 감소.`, result.grade === 'S' || result.grade === 'A' ? 'good' : result.grade === 'B' ? 'mid' : 'bad');
+  addBattleLog(`[FEEDBACK] ${result.feedback}`, result.score >= 82 ? 'good' : result.score >= 62 ? 'mid' : 'bad');
+
+  document.getElementById('battleAnswer').value = '';
+  updateBattleUI();
+
+  if (battleState.round >= battleState.maxRounds) {
+    finishInterviewBattle();
+  } else {
+    if (battleState.hp <= 0) {
+      addBattleLog('[NOTICE] 보스 HP가 0이 되었습니다. 하지만 면접은 아직 끝나지 않았습니다. 남은 질문까지 답변해야 최종 점수가 나옵니다.', 'mid');
+    }
+    nextBattleQuestion();
+  }
+}
+
+function finishInterviewBattle() {
+  battleState.active = false;
+  document.getElementById('attackBtn').disabled = true;
+  document.getElementById('battleQuestion').textContent = '면접 종료. 오른쪽에서 최종 점수를 확인하세요.';
+  document.getElementById('battlePhase').textContent = 'INTERVIEW COMPLETE';
+
+  const finalScore = battleState.totalScore || 0;
+  const rank = finalScore >= 90 ? 'S · 강력 합격권' :
+               finalScore >= 80 ? 'A · 합격 가능권' :
+               finalScore >= 65 ? 'B · 보완 필요' :
+               finalScore >= 50 ? 'C · 위험' : 'D · 재준비 필요';
+  const comment = finalScore >= 90 ? '답변이 구체적이고 경험, 행동, 결과, 직무 연결이 모두 살아 있습니다. 실제 면접에서도 설득력이 높습니다.' :
+                  finalScore >= 80 ? '전반적으로 좋은 면접입니다. 다만 몇몇 답변에 수치나 결과를 더 넣으면 더 강해집니다.' :
+                  finalScore >= 65 ? '기본 구조는 있지만 답변이 아직 추상적인 부분이 있습니다. 경험과 결과를 더 선명하게 정리하세요.' :
+                  finalScore >= 50 ? '질문에 답은 했지만 면접관을 설득할 근거가 부족합니다. STAR 구조로 다시 연습하는 것이 좋습니다.' :
+                  '답변 길이, 구체성, 직무 연결이 모두 부족합니다. 포트폴리오 경험부터 다시 정리해야 합니다.';
+
+  document.getElementById('finalInterviewScore').textContent = `${finalScore}점`;
+  document.getElementById('finalInterviewRank').textContent = rank;
+  document.getElementById('finalInterviewComment').textContent = comment;
+  document.getElementById('battleFinalResult').style.display = 'block';
+  addBattleLog(`[RESULT] 면접 종료. 최종 면접 점수: ${finalScore}점 / ${rank}`, finalScore >= 80 ? 'good' : finalScore >= 65 ? 'mid' : 'bad');
+  showNotif(`면접 종료: ${finalScore}점`);
+}
+
+function scoreBattleAnswer(answer, boss) {
+  const text = answer.toLowerCase();
+  let score = 0;
+  const lengthScore = Math.min(18, Math.floor(answer.length / 18));
+  score += lengthScore;
+
+  const evidenceWords = ['프로젝트','경험','결과','성과','수치','사용자','문제','해결','역할','배운','개선','협업','팀','피드백','완성','배포','분석','기획'];
+  const starWords = ['상황','목표','행동','결과','배운','느낀','개선','다음','책임'];
+  const jobWords = ['회사','직무','지원','서비스','사용자','가치','성장','기여','문제 해결'];
+  const bossWords = (boss.industry.includes('AI') ? ['ai','데이터','모델','안전','윤리','성능'] :
+                    boss.industry.includes('컨설팅') ? ['구조','가설','분석','논리','의사결정'] :
+                    boss.industry.includes('공공') ? ['공공','규정','책임','민원','신뢰'] :
+                    ['기술','서비스','사용자','프로젝트','개발','디자인']);
+
+  const countHits = (arr) => arr.reduce((n, w) => n + (text.includes(w.toLowerCase()) ? 1 : 0), 0);
+  score += countHits(evidenceWords) * 3;
+  score += countHits(starWords) * 4;
+  score += countHits(jobWords) * 3;
+  score += countHits(bossWords) * 4;
+  if (/\d/.test(answer)) score += 8;
+  if (answer.includes('왜냐하면') || answer.includes('따라서') || answer.includes('그래서')) score += 5;
+
+  const rankGuard = { easy: 0, normal: 4, hard: 8, nightmare: 12 }[boss.rank];
+  let answerScore = clamp(Math.round(score * 1.45) - rankGuard, 35, 100);
+  let damage = clamp(Math.round(answerScore / 3.1), 8, 34);
+  let grade = answerScore >= 90 ? 'S' : answerScore >= 80 ? 'A' : answerScore >= 65 ? 'B' : answerScore >= 50 ? 'C' : 'D';
+  let feedback = '답변에 경험은 있지만 결과와 배운 점을 더 분명하게 말하면 점수가 올라갑니다.';
+  if (grade === 'S') feedback = '상황, 행동, 결과, 직무 연결이 모두 살아 있습니다. 면접관에게 근거 있는 인상을 줍니다.';
+  else if (grade === 'A') feedback = '좋은 답변입니다. 수치나 구체적 결과를 조금 더 넣으면 결정타가 됩니다.';
+  else if (grade === 'C' || grade === 'D') feedback = '추상적인 표현이 많습니다. 실제 경험, 본인 역할, 결과를 더 넣어야 합니다.';
+  return { score: answerScore, damage, grade, feedback };
+}
+
+function updateBattleUI() {
+  const hp = battleState.hp ?? 100;
+  document.getElementById('bossHpText').textContent = `${hp} / 100`;
+  document.getElementById('bossHpFill').style.width = `${hp}%`;
+  document.getElementById('battleRound').textContent = battleState.round ?? 0;
+  if (!battleState.active && hp === 100) {
+    document.getElementById('lastDamage').textContent = '0';
+    document.getElementById('lastGrade').textContent = '-';
+    document.getElementById('finalScoreMini').textContent = '-';
+  }
+}
+
+function addBattleLog(message, type='') {
+  const log = document.getElementById('battleLog');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  line.textContent = message;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
 }
 
 // ============ INIT ============
