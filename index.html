@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>보스 배틀 이력서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Refined Color Palette */
+    --bg: #0d1117; /* Deeper, softer dark */
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: rgba(240, 246, 252, 0.1);
+    --border-bright: rgba(240, 246, 252, 0.2);
+    
+    --neon-blue: #58a6ff; /* Softer, richer blue */
+    --neon-red: #f85149;  /* More vibrant, less harsh red */
+    --neon-gold: #f2cc60;
+    --neon-green: #3fb950;
+    
+    --text-main: #c9d1d9;
+    --text-bold: #f0f6fc;
+    --muted: #8b949e;
+    --dim: #484f58;
+    
+    --ease: cubic-bezier(0.23, 1, 0.32, 1); /* Human-like motion curve */
+    --font-main: 'Noto Sans KR', 'Exo 2', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-orbit: 'Orbitron', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+
+  html { 
+    scroll-behavior: smooth; 
+    font-size: 16px; 
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--bg);
+    /* Subtle noise texture for human touch */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3FfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3F/filter%3E%3Frect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3F/svg%3E");
+    background-opacity: 0.02;
+    color: var(--text-main);
+    font-family: var(--font-main);
+    overflow-x: hidden;
+    cursor: default;
+    line-height: 1.6;
+  }
+
+  /* GRID BACKGROUND - More subtle */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(88, 166, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(88, 166, 255, 0.015) 1px, transparent 1px);
+    background-size: 80px 80px;
+    background-position: center;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Re-designed Corner Decorations */
+  .corner-deco {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .corner-deco::before, .corner-deco::after {
+    content: '';
+    position: absolute;
+    background: var(--dim);
+  }
+  /* Top Left */
+  .corner-deco.tl { top: 20px; left: 20px; }
+  .corner-deco.tl::before { width: 1px; height: 100%; top: 0; left: 0; }
+  .corner-deco.tl::after { width: 100%; height: 1px; top: 0; left: 0; }
+  /* Top Right */
+  .corner-deco.tr { top: 20px; right: 20px; }
+  .corner-deco.tr::before { width: 1px; height: 100%; top: 0; right: 0; }
+  .corner-deco.tr::after { width: 100%; height: 1px; top: 0; right: 0; }
+  /* Bottom Left */
+  .corner-deco.bl { bottom: 20px; left: 20px; }
+  .corner-deco.bl::before { width: 1px; height: 100%; bottom: 0; left: 0; }
+  .corner-deco.bl::after { width: 100%; height: 1px; bottom: 0; left: 0; }
+  /* Bottom Right */
+  .corner-deco.br { bottom: 20px; right: 20px; }
+  .corner-deco.br::before { width: 1px; height: 100%; bottom: 0; right: 0; }
+  .corner-deco.br::after { width: 100%; height: 1px; bottom: 0; right: 0; }
+
+  /* STATUS BAR - Clean Modern */
+  .status-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 40px;
+    background: rgba(13, 17, 23, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    z-index: 100;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  .status-bar .sys-label { color: var(--neon-blue); font-weight: bold; }
+  .status-indicator { display: flex; align-items: center; gap: 10px; }
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
+    animation: pulse-glow 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse-glow {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.9); }
+  }
+  .sys-time { color: var(--text-bold); }
+
+  /* MAIN WRAPPER */
+  .app { position: relative; z-index: 1; padding-top: 40px; }
+
+  /* ============ Re-designed HERO ============ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 5px;
+    color: var(--muted);
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease) 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: var(--font-orbit);
+    font-size: clamp(48px, 10vw, 110px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -3px;
+    margin-bottom: 15px;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease) 0.4s forwards;
+    color: var(--text-bold);
+  }
+  .hero-title span { display: block; }
+  
+  .hero-title .line2 {
+    color: var(--neon-red);
+    text-shadow: 0 0 30px rgba(248, 81, 73, 0.3);
+  }
+  .hero-title .line3 { 
+    color: var(--neon-blue); 
+    text-shadow: 0 0 30px rgba(88, 166, 255, 0.3);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--text-main);
+    letter-spacing: 2px;
+    margin: 30px 0 40px;
+    font-family: var(--font-main);
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease) 0.6s forwards;
+  }
+
+  .hero-description {
+    max-width: 760px;
+    margin: 0 auto 50px;
+    padding: 30px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    opacity: 0;
+    animation: fadeUp 1s var(--ease) 0.8s forwards;
+  }
+
+  .hero-description p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-main);
+    margin-bottom: 15px;
+  }
+  .hero-description p:last-child { margin-bottom: 0; }
+
+  .hero-description strong {
+    color: var(--neon-blue);
+    font-weight: 500;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease) 1s forwards;
+    flex-wrap: wrap;
+    margin-bottom: 60px;
+  }
+
+  /* Human-touch Buttons (COMPACT & FIT-CONTENT) */
+  .btn-primary, .btn-secondary {
+    font-family: var(--font-orbit);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 22px; /* 줄어든 패딩 */
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content; /* 텍스트 크기에 맞춤 */
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary {
+    background: var(--neon-red);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 15px rgba(248, 81, 73, 0.3);
+  }
+  .btn-primary:hover {
+    background: #fff;
+    color: var(--neon-red);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(248, 81, 73, 0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--neon-blue);
+    border: 1px solid var(--neon-blue);
+  }
+  .btn-secondary:hover {
+    background: rgba(88, 166, 255, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(88, 166, 255, 0.15);
+  }
+
+  /* Sophisticated HP BAR */
+  .hp-bar-deco {
+    width: 320px;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease) 1.2s forwards;
+    background: var(--surface);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .hp-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .hp-track {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-green), #88ffaa);
+    box-shadow: 0 0 10px rgba(63, 185, 80, 0.5);
+    border-radius: 2px;
+    animation: hpDrain 5s var(--ease) 2s infinite alternate;
+  }
+  @keyframes hpDrain {
+    0% { width: 90%; background: var(--neon-green); }
+    100% { width: 20%; background: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); }
+  }
+
+  /* Clean Scroll Indicator */
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    animation: fadeUp 1s var(--ease) 1.5s forwards;
+    opacity: 0;
+  }
+  .scroll-arrow {
+    width: 16px;
+    height: 16px;
+    border-right: 1px solid var(--dim);
+    border-bottom: 1px solid var(--dim);
+    transform: rotate(45deg);
+    margin: 15px auto 0;
+    animation: scrollBounce 2s infinite;
+  }
+  @keyframes scrollBounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(45deg); opacity: 0.5; }
+    40% { transform: translateY(8px) rotate(45deg); opacity: 1; }
+    60% { transform: translateY(4px) rotate(45deg); opacity: 0.8; }
+  }
+
+  /* ============ SECTION GENERAL ============ */
+  .section {
+    padding: 120px 24px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 60px;
+  }
+  .section-number {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--dim);
+    font-weight: bold;
+  }
+  .section-title {
+    font-family: var(--font-orbit);
+    font-size: clamp(28px, 5vw, 36px);
+    font-weight: 700;
+    color: var(--text-bold);
+    letter-spacing: -1px;
+    white-space: nowrap;
+  }
+  .section-title span { color: var(--neon-blue); }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border-bright);
+  }
+
+  /* ============ Re-designed BOSS CARDS ============ */
+  .boss-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+  }
+
+  .boss-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s var(--ease);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .boss-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(88, 166, 255, 0.05) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease);
+  }
+
+  .boss-card:hover {
+    border-color: var(--neon-blue);
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+  }
+  .boss-card:hover::after { opacity: 1; }
+
+  .boss-card.nightmare { border-color: rgba(248, 81, 73, 0.3); }
+  .boss-card.nightmare:hover {
+    border-color: var(--neon-red);
+    box-shadow: 0 15px 30px rgba(248, 81, 73, 0.15);
+  }
+
+  .boss-card-inner { 
+    padding: 30px; 
+    position: relative; 
+    z-index: 1; 
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .boss-rank-wrap { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;}
+
+  .boss-rank {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+    width: fit-content;
+  }
+  .boss-rank.easy { color: var(--neon-green); background: rgba(63, 185, 80, 0.1); }
+  .boss-rank.normal { color: var(--neon-blue); background: rgba(88, 166, 255, 0.1); }
+  .boss-rank.hard { color: var(--neon-gold); background: rgba(242, 204, 96, 0.1); }
+  .boss-rank.nightmare { color: var(--neon-red); background: rgba(248, 81, 73, 0.1); }
+
+  .boss-logo {
+    font-family: var(--font-orbit);
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 5px;
+    letter-spacing: -1px;
+    color: var(--text-bold);
+  }
+
+  .boss-name {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-family: var(--font-main);
+  }
+
+  .boss-lore {
+    color: var(--text-main);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    flex-grow: 1;
+    opacity: 0.8;
+  }
+
+  .boss-hp-section { margin-bottom: 25px; }
+  .boss-hp-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .boss-hp-track {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 1.5px;
+    overflow: hidden;
+  }
+  .boss-hp-fill {
+    height: 100%;
+    border-radius: 1.5px;
+    transition: width 1s var(--ease);
+  }
+  .easy .boss-hp-fill { background: var(--neon-green); width: 35%; box-shadow: 0 0 5px var(--neon-green); }
+  .normal .boss-hp-fill { background: var(--neon-blue); width: 60%; box-shadow: 0 0 5px var(--neon-blue); }
+  .hard .boss-hp-fill { background: var(--neon-gold); width: 80%; box-shadow: 0 0 5px var(--neon-gold); }
+  .nightmare .boss-hp-fill { background: var(--neon-red); width: 100%; box-shadow: 0 0 10px var(--neon-red); }
+
+  .boss-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+  .boss-stat {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    transition: border-color 0.3s;
+  }
+  .boss-card:hover .boss-stat { border-color: var(--border); }
+
+  .boss-stat-name {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .boss-stat-val {
+    font-family: var(--font-orbit);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bold);
+  }
+
+  /* COMPACT BOSS BUTTON */
+  .boss-attack-btn {
+    width: fit-content;
+    align-self: flex-start; /* 텍스트 시작선에 맞춤 */
+    font-family: var(--font-orbit);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid var(--dim);
+    color: var(--muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    text-transform: uppercase;
+    margin-top: auto;
+  }
+  .boss-card:hover .boss-attack-btn {
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+    background: rgba(88, 166, 255, 0.05);
+  }
+  .boss-card.nightmare:hover .boss-attack-btn {
+    border-color: var(--neon-red);
+    color: var(--neon-red);
+    background: rgba(248, 81, 73, 0.05);
+  }
+
+  .warning-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--neon-red);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ============ Re-designed ANALYSIS SECTION ============ */
+  .analysis-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+  }
+
+  @media (max-width: 1000px) {
+    .analysis-wrapper { grid-template-columns: 1fr; }
+  }
+
+  .analysis-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 35px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column; /* 추가: 내부 요소 정렬을 위해 */
+  }
+
+  .panel-label {
+    font-family: var(--font-orbit);
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .panel-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-group { margin-bottom: 20px; width: 100%; }
+  .form-label {
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-bold);
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--surface2);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 6px;
+    transition: all 0.3s;
+    -webkit-appearance: none;
+  }
+  .form-input:hover, .form-textarea:hover, .form-select:hover {
+    border-color: var(--dim);
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    border-color: var(--neon-blue);
+    background: rgba(13, 17, 23, 0.5);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+  }
+  .form-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+  .form-select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px;}
+  .form-select option { background: var(--surface); color: var(--text-main); }
+
+  /* COMPACT SKILL TAGS */
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .skill-tag {
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 400;
+    padding: 6px 12px; /* 줄어든 패딩 */
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid transparent;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+  }
+  .skill-tag:hover {
+    border-color: var(--dim);
+    color: var(--text-bold);
+  }
+  .skill-tag.active {
+    background: rgba(88, 166, 255, 0.1);
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+    font-weight: 500;
+  }
+
+  /* COMPACT ANALYZE BUTTON */
+  .analyze-btn {
+    width: fit-content;
+    align-self: flex-start;
+    font-family: var(--font-orbit);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 12px 26px; /* 줄어든 패딩 */
+    margin-top: 10px;
+  }
+
+  .engine-note {
+    margin-top: 15px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    line-height: 1.5;
+    text-align: left; /* 좌측 정렬 */
+    width: 100%;
+  }
+
+  /* ============ Re-designed RESULT PANEL ============ */
+  .result-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 35px;
+    min-height: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .result-idle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 350px;
+    text-align: center;
+    gap: 15px;
+    color: var(--dim);
+  }
+  .result-idle-icon {
+    font-size: 50px;
+    font-family: var(--font-orbit);
+    font-weight: 900;
+  }
+  .result-idle p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .loading-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 350px;
+    gap: 20px;
+  }
+  .loading-ring {
+    width: 40px; height: 40px;
+    border: 2px solid var(--surface2);
+    border-top-color: var(--neon-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+  }
+
+  .result-content { display: none; animation: fadeIn 0.5s var(--ease); }
+
+  .result-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 15px;
+  }
+
+  .survival-rate-wrap { display: flex; align-items: baseline; gap: 4px;}
+  .survival-rate {
+    font-family: var(--font-orbit);
+    font-size: 50px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .percent-symbol { font-size: 20px; color: var(--muted); font-weight: 400; }
+  .survival-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .difficulty-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    background: var(--surface2);
+    width: fit-content;
+  }
+
+  .result-section { margin-bottom: 25px; }
+  .result-section-title {
+    font-family: var(--font-orbit);
+    font-size: 12px;
+    color: var(--text-bold);
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .result-text {
+    font-size: 14px;
+    color: var(--text-main);
+    line-height: 1.7;
+  }
+
+  .result-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .result-list li {
+    font-size: 13px;
+    color: var(--text-main);
+    padding: 12px;
+    background: var(--surface2);
+    border-radius: 6px;
+    border-left: 3px solid var(--neon-blue);
+    opacity: 0;
+    animation: fadeRight 0.5s var(--ease) forwards;
+  }
+  @keyframes fadeRight {
+    from { opacity: 0; transform: translateX(-15px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .stat-bars { display: flex; flex-direction: column; gap: 12px; }
+  .stat-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 35px;
+    gap: 12px;
+    align-items: center;
+  }
+  .stat-row-name {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: right;
+  }
+  .stat-bar-track {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 2.5px;
+    overflow: hidden;
+  }
+  .stat-bar-fill {
+    height: 100%;
+    background: var(--neon-blue);
+    width: 0%;
+    border-radius: 2.5px;
+    transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .stat-row-val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-bold);
+    font-weight: bold;
+  }
+
+  /* ============ Re-designed HOW IT WORKS ============ */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+  }
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 30px;
+    transition: all 0.3s;
+  }
+  .step-card:hover {
+    border-color: var(--border-bright);
+    background: var(--surface2);
+    transform: translateY(-4px);
+  }
+  .step-number {
+    font-family: var(--font-orbit);
+    font-size: 32px;
+    font-weight: 900;
+    color: rgba(88, 166, 255, 0.1);
+    line-height: 1;
+    margin-bottom: 15px;
+  }
+  .step-title {
+    font-family: var(--font-main);
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-bold);
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--text-main);
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  /* ============ FOOTER ============ */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 50px 24px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+  .footer span { color: var(--muted); }
+
+  .hero::after {
+    content: 'STATIC ANALYTICS ENGINE // NO API REQUIRED';
+    position: absolute;
+    top: 50px;
+    right: 25px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--neon-green);
+    border: 1px solid rgba(63, 185, 80, 0.3);
+    padding: 5px 10px;
+    border-radius: 4px;
+    background: rgba(63, 185, 80, 0.05);
+  }
+
+  .fade-in-section {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+  }
+  .fade-in-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* SELECTED BOSS BAR Re-styled */
+  .boss-selected-bar {
+    position: sticky;
+    top: 40px;
+    background: rgba(22, 27, 34, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--neon-blue);
+    padding: 12px 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 90;
+    display: none;
+    animation: slideDown 0.4s var(--ease);
+  }
+  @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+  
+  .boss-selected-bar.active { display: flex; }
+  .selected-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+  .selected-name { font-family: var(--font-orbit); font-size: 14px; color: var(--text-bold); font-weight: 700; }
+  
+  /* COMPACT CLEAR BUTTON */
+  .clear-boss {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--neon-red);
+    background: none;
+    border: 1px solid rgba(248, 81, 73, 0.3);
+    padding: 5px 10px; /* 줄어든 패딩 */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: fit-content;
+  }
+  .clear-boss:hover { background: rgba(248, 81, 73, 0.1); border-color: var(--neon-red); }
+
+  /* NOTIFICATION Re-styled */
+  .notif {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: var(--surface2);
+    border: 1px solid var(--border-bright);
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-family: var(--font-main);
+    font-size: 13px;
+    color: var(--text-bold);
+    z-index: 9998;
+    transform: translateY(100px);
+    transition: transform 0.4s var(--ease), opacity 0.4s;
+    opacity: 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .notif::before { content:'✓'; color: var(--neon-green); font-weight: bold; }
+  .notif.show { transform: translateY(0); opacity: 1; }
+
+  /* ============ INTERVIEW BOSS BATTLE MODE Re-styled ============ */
+  .battle-arena {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 25px;
+    align-items: stretch;
+  }
+  @media (max-width: 1000px) { .battle-arena { grid-template-columns: 1fr; } }
+
+  .battle-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 35px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  
+  .boss-battle-name {
+    font-family: var(--font-orbit);
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    color: var(--text-bold);
+    margin: 10px 0;
+  }
+  
+  .battle-hp-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin: 25px 0 8px;
+  }
+  .battle-hp-track {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .battle-hp-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--neon-red), #ff7a29);
+    transition: width 0.5s var(--ease);
+    box-shadow: 0 0 12px rgba(248, 81, 73, 0.4);
+    border-radius: 4px;
+  }
+  
+  .battle-question-card {
+    margin: 25px 0;
+    padding: 20px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .battle-phase {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--neon-blue);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .battle-question {
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 700;
+    color: var(--text-bold);
+  }
+  
+  .battle-answer {
+    min-height: 150px;
+    margin-bottom: 20px;
+  }
+  
+  .battle-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px; /* 버튼 사이 간격 */
+  }
+  
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 12px;
+    margin-top: 25px;
+  }
+  .score-box {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .score-box span {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .score-box strong {
+    font-family: var(--font-orbit);
+    font-size: 20px;
+    color: var(--text-bold);
+  }
+  
+  .battle-log {
+    min-height: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .battle-log::-webkit-scrollbar { width: 4px; }
+  .battle-log::-webkit-scrollbar-track { background: var(--surface); }
+  .battle-log::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 2px; }
+
+  .log-line {
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 6px;
+    color: var(--text-main);
+    line-height: 1.5;
+  }
+  .log-line.good { color: var(--neon-green); background: rgba(63, 185, 80, 0.05); border: 1px solid rgba(63, 185, 80, 0.1); }
+  .log-line.mid { color: var(--neon-gold); background: rgba(242, 204, 96, 0.05); border: 1px solid rgba(242, 204, 96, 0.1); }
+  .log-line.bad { color: var(--neon-red); background: rgba(248, 81, 73, 0.05); border: 1px solid rgba(248, 81, 73, 0.1); }
+  
+  .battle-final-result {
+    display: none;
+    margin-top: 25px;
+    padding: 25px;
+    border-radius: 8px;
+    border: 2px solid var(--neon-blue);
+    background: rgba(88, 166, 255, 0.05);
+    text-align: center;
+    animation: fadeIn 0.5s var(--ease);
+  }
+  .final-score-big {
+    font-family: var(--font-orbit);
+    font-size: 60px;
+    font-weight: 900;
+    color: var(--neon-blue);
+    line-height: 1;
+    margin: 12px 0;
+  }
+  .final-rank {
+    font-family: var(--font-main);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--neon-gold);
+    margin-bottom: 12px;
+  }
+  .final-comment {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-main);
+  }
+
+  /* Animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Mobile optimization fixes */
+  @media (max-width: 700px) {
+    .section { padding: 60px 20px; }
+    .hero { padding-top: 80px; }
+    .hero-title { font-size: 36px; }
+    .boss-grid { grid-template-columns: 1fr; }
+    .result-header { flex-direction: column; align-items: flex-start; }
+    .status-bar { padding: 0 15px; }
+    .status-indicator span:not(.pulse-dot) { display: none; }
+    .analysis-panel, .result-panel, .battle-panel { padding: 20px; }
+    .battle-arena { gap: 20px; }
+    .btn-primary, .btn-secondary, .analyze-btn, .boss-attack-btn { padding: 8px 16px; font-size: 11px; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="corner-deco tl"></div>
+<div class="corner-deco tr"></div>
+<div class="corner-deco bl"></div>
+<div class="corner-deco br"></div>
+
+<div class="status-bar">
+  <span class="sys-label">BBR_ENGINE v3.1//PRO</span>
+  <div class="status-indicator">
+    <div class="pulse-dot"></div>
+    <span style="color: var(--neon-green);">SYSTEM ONLINE</span>
+  </div>
+  <span class="sys-time" id="clock">--:--:--</span>
+</div>
+
+<div class="boss-selected-bar" id="selectedBossBar">
+  <span class="selected-label">TARGET LOCKED:</span>
+  <span class="selected-name" id="selectedBossName"></span>
+  <span class="boss-rank" id="selectedBossRank"></span>
+  <button class="clear-boss" onclick="clearBoss()">[RELEASE]</button>
+</div>
+
+<div class="app">
+
+  <section class="hero">
+    <div class="hero-eyebrow">// 커리어 RPG 시스템 // 취업 전투 분석 엔진</div>
+    <h1 class="hero-title">
+      <span class="line1">BOSS</span>
+      <span class="line2">BATTLE</span>
+      <span class="line3">RESUME</span>
+    </h1>
+    <p class="hero-sub">커리어 도전을 게임처럼 // 나의 면접 생존 확률은?</p>
+
+    <div class="hero-description">
+      <p>
+        <strong>Boss Battle Resume</strong>는 취업과 면접 과정을
+        RPG 보스전으로 재해석한 인터랙티브 웹사이트입니다.
+      </p>
+      <p>
+        지원하려는 기업을 보스로 선택하고,
+        자신의 스킬·경험·포트폴리오를 입력하면
+        예상 난이도, 생존 확률, 약점 분석,
+        추천 성장 경로를 확인할 수 있습니다.
+      </p>
+    </div>
+
+    <div class="hero-cta">
+      <a href="#bosses" class="btn-primary">보스 선택</a>
+      <a href="#analysis" class="btn-secondary">분석 시작</a>
+      <a href="#interviewBattle" class="btn-secondary">면접 보스전</a>
+    </div>
+    <div class="hp-bar-deco">
+      <div class="hp-label">
+        <span>PLAYER HP</span>
+        <span id="hpVal">87 / 100</span>
+      </div>
+      <div class="hp-track">
+        <div class="hp-fill" id="hpFill"></div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      SCROLL DOWN
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <div class="section fade-in-section">
+    <div class="section-header">
+      <span class="section-number">00</span>
+      <h2 class="section-title">사용 <span>방법</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-title">보스 선택</div>
+        <p class="step-desc">보스 명단에서 목표 기업을 선택하세요. 각 보스는 쉬움부터 악몽까지 난이도 등급이 있습니다.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-title">스탯 입력</div>
+        <p class="step-desc">보유 스킬, 전공, 경력, 포트폴리오, 성격 특성을 입력해 나만의 파이터 프로필을 완성하세요.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-title">AI 분석</div>
+        <p class="step-desc">브라우저 안에서 생존 확률을 계산하고 약점을 파악하며 보스의 공격 패턴을 분석합니다.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">04</div>
+        <div class="step-title">면접 전투</div>
+        <p class="step-desc">보스가 면접 질문을 던지면 답변을 입력하세요. 답변의 구체성에 따라 보스 HP가 깎입니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section fade-in-section" id="bosses">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2 class="section-title">보스 <span>선택</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="boss-grid" id="bossGrid">
+      </div>
+  </div>
+
+  <div class="section fade-in-section" id="analysis">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-title">전투 <span>분석</span></h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="analysis-wrapper">
+      <div class="analysis-panel">
+        <div class="panel-label">플레이어 프로필 입력</div>
+
+        <div class="form-group">
+          <label class="form-label">목표 보스 (직접 선택)</label>
+          <select class="form-select" id="bossSelect">
+            <option value="">— 위에서 선택한 보스 자동 적용 —</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">전공 / 분야</label>
+          <input class="form-input" type="text" id="major" placeholder="예: 컴퓨터공학, 디자인, 경영학..." />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">경력 수준</label>
+          <select class="form-select" id="experience">
+            <option value="student">학생 / 경력 없음</option>
+            <option value="junior">주니어 (0~2년)</option>
+            <option value="mid">미드레벨 (2~5년)</option>
+            <option value="senior">시니어 (5년 이상)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">보유 스킬 (클릭하여 선택)</label>
+          <div class="skill-tags" id="skillTags">
+            <span class="skill-tag" onclick="toggleSkill(this)">Python</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">JavaScript</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">React</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">SQL</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">ML/AI</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">UI/UX</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">기획</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">데이터 분석</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">리더십</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">커뮤니케이션</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Figma</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">클라우드/AWS</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">DevOps</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">재무/회계</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">마케팅</span>
+          </div>
+          <input class="form-input" type="text" id="customSkills" placeholder="+ 추가 스킬 직접 입력..." style="margin-top: 15px;" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">포트폴리오 / 프로젝트</label>
+          <textarea class="form-textarea" id="portfolio" placeholder="주요 프로젝트, GitHub, 노션, 작업물 등을 설명해 주세요..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">성격 특성</label>
+          <input class="form-input" type="text" id="personality" placeholder="예: 분석적, 창의적, 협력적, 꼼꼼한..." />
+        </div>
+
+        <button class="analyze-btn btn-primary" id="analyzeBtn" onclick="runAnalysis()">
+          ⚔ 분석 시작
+        </button>
+        <div class="engine-note">※ 본 엔진은 최신 휴리스틱 알고리즘 기반의 로컬 시뮬레이터입니다.</div>
+      </div>
+
+      <div class="result-panel" id="resultPanel">
+        <div class="panel-label">전투 분석 결과</div>
+
+        <div class="result-idle" id="resultIdle">
+          <div class="result-idle-icon">?</div>
+          <p>플레이어 데이터 대기 중</p>
+          <p style="opacity:0.5; font-size:11px;">프로필을 설정하고 분석 시작을 눌러주세요</p>
+        </div>
+
+        <div class="loading-state" id="loadingState">
+          <div class="loading-ring"></div>
+          <div class="loading-text" id="loadingText">보스 데이터 스캔 중...</div>
+        </div>
+
+        <div class="result-content" id="resultContent">
+          </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="section fade-in-section" id="interviewBattle">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-title">면접 <span>보스전</span></h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="battle-arena">
+      <div class="battle-panel">
+        <div class="panel-label">실전 면접 전투 모드</div>
+        <p class="result-text" style="margin-bottom:20px; font-size:14px; color:var(--muted);">선택한 보스가 면접 질문을 냅니다. 답변에 경험, 행동, 결과, 배운 점이 들어갈수록 더 큰 데미지가 들어갑니다.</p>
+        <div class="boss-battle-name" id="battleBossName">NO TARGET</div>
+        <p class="battle-subtext" id="battleBossInfo" style="font-family:var(--font-mono); font-size:12px; color:var(--dim);">먼저 보스를 선택한 뒤 전투 시작을 누르세요.</p>
+
+        <div class="battle-hp-label">
+          <span>BOSS HP</span>
+          <span id="bossHpText">100 / 100</span>
+        </div>
+        <div class="battle-hp-track"><div class="battle-hp-fill" id="bossHpFill"></div></div>
+
+        <div class="score-grid">
+          <div class="score-box"><span>ROUND</span><strong id="battleRound">0</strong></div>
+          <div class="score-box"><span>DMG</span><strong id="lastDamage">0</strong></div>
+          <div class="score-box"><span>GRADE</span><strong id="lastGrade">-</strong></div>
+          <div class="score-box"><span>TOTAL</span><strong id="finalScoreMini">-</strong></div>
+        </div>
+
+        <div class="battle-question-card">
+          <div class="battle-phase" id="battlePhase">PHASE 00</div>
+          <div class="battle-question" id="battleQuestion">보스전을 시작하면 질문이 나타납니다.</div>
+        </div>
+
+        <textarea class="battle-answer form-textarea" id="battleAnswer" placeholder="여기에 면접 답변을 작성하세요... 상황(S), 역할(T), 행동(A), 결과(R) 구조를 갖추면 고득점이 가능합니다."></textarea>
+
+        <div class="battle-controls">
+          <button class="btn-primary battle-btn" onclick="startInterviewBattle()">전투 시작</button>
+          <button class="btn-secondary battle-btn" id="attackBtn" onclick="submitBattleAnswer()" disabled>답변 공격</button>
+          <button class="btn-secondary battle-btn" onclick="resetInterviewBattle()" style="border-color:var(--dim); color:var(--dim);">리셋</button>
+        </div>
+      </div>
+
+      <div class="battle-panel">
+        <div class="panel-label">전투 로그</div>
+        <div class="battle-log" id="battleLog">
+          <div class="log-line">[SYSTEM] 보스전 대기 중. 보스를 선택하고 전투 시작을 누르세요.</div>
+          <div class="log-line">[TIP] 좋은 답변 = 상황 + 행동 + 결과 + 배운 점 + 직무 연결.</div>
+        </div>
+        <div class="battle-final-result" id="battleFinalResult">
+          <div class="survival-label" style="margin-bottom:10px;">INTERVIEW RESULT</div>
+          <div class="final-score-big" id="finalInterviewScore">0</div>
+          <div class="final-rank" id="finalInterviewRank">-</div>
+          <p class="final-comment" id="finalInterviewComment"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>보스 배틀 이력서</span> // 커리어 전투 시뮬레이션 시스템 // 로컬 분석 엔진<br>
+    <span style="opacity:0.3; margin-top: 15px; display: block; font-size:10px;">본 프로젝트는 구직자를 위한 시뮬레이션 툴이며, 실제 기업의 채용 기준과는 다를 수 있습니다.</span>
+  </div>
+
+</div><div class="notif" id="notif"></div>
+
+<script>
+// ============ DATA ============
+const BOSSES = [
+  { id: 'google', name: 'Google LLC', short: 'GOOG', industry: '빅테크', rank: 'nightmare', hp: 100,
+    stats: { atk: 98, def: 95, spd: 90, int: 99 },
+    lore: '테크 업계 최종 보스. 5~7라운드의 전설적인 면접 관문. 알고리즘 완전 정복이 필수.' },
+  { id: 'meta', name: 'Meta Platforms', short: 'META', industry: '소셜 테크', rank: 'nightmare', hp: 97,
+    stats: { atk: 95, def: 90, spd: 92, int: 96 },
+    lore: '빠르게 움직이고 자신감을 박살낸다. 시스템 설계 + 행동 면접의 연속 공세.' },
+  { id: 'amazon', name: 'Amazon', short: 'AMZN', industry: '이커머스/클라우드', rank: 'hard', hp: 88,
+    stats: { atk: 90, def: 85, spd: 88, int: 87 },
+    lore: '리더십 원칙 14개가 무기다. STAR 형식 집중 포격과 오너십 심문을 각오하라.' },
+  { id: 'apple', name: 'Apple Inc.', short: 'AAPL', industry: '소비자 테크', rank: 'hard', hp: 85,
+    stats: { atk: 88, def: 92, spd: 75, int: 93 },
+    lore: '속도보다 완성도를 중시. 픽셀 단위의 사고력과 제품에 대한 깊은 집착이 필요.' },
+  { id: 'netflix', name: 'Netflix', short: 'NFLX', industry: '스트리밍/테크', rank: 'hard', hp: 80,
+    stats: { atk: 85, def: 78, spd: 82, int: 88 },
+    lore: '자유도 높고 책임도 높다. 프로세스 안전망 없음. 규칙보다 판단력이 우선.' },
+  { id: 'stripe', name: 'Stripe', short: 'STRP', industry: '핀테크', rank: 'hard', hp: 82,
+    stats: { atk: 87, def: 80, spd: 85, int: 90 },
+    lore: '엘리트 수준의 글쓰기 능력 필수. 명확한 사고력만 통과. 기술적이고 사용자 집착적.' },
+  { id: 'openai', name: 'OpenAI', short: 'OAI', industry: 'AI 연구', rank: 'nightmare', hp: 95,
+    stats: { atk: 99, def: 88, spd: 86, int: 99 },
+    lore: '프론티어 최종 보스. AI/ML 완전 정복 + 안전 의식 필수. 미션 정렬이 핵심.' },
+  { id: 'startup', name: '시리즈A 스타트업', short: 'STUP', industry: '스타트업', rank: 'normal', hp: 60,
+    stats: { atk: 65, def: 50, spd: 95, int: 70 },
+    lore: '혼돈스럽지만 쓰러뜨릴 수 있다. 추진력과 다재다능함을 중시. 면접은 빠르고 기대치는 다양.' },
+  { id: 'microsoft', name: 'Microsoft', short: 'MSFT', industry: '엔터프라이즈 테크', rank: 'hard', hp: 83,
+    stats: { atk: 86, def: 88, spd: 78, int: 89 },
+    lore: '성장 마인드셋 테스트. 체계적인 코딩 라운드와 Azure 생태계 전문성 검증.' },
+  { id: 'localco', name: '중소기업/로컬', short: 'SMB', industry: '소규모 사업체', rank: 'easy', hp: 28,
+    stats: { atk: 30, def: 25, spd: 60, int: 40 },
+    lore: '진입 장벽 낮고 인간미 높음. 기술력보다 문화적 적합성과 소통 능력이 핵심.' },
+  { id: 'consulting', name: 'McKinsey', short: 'MCK', industry: '컨설팅', rank: 'hard', hp: 86,
+    stats: { atk: 88, def: 82, spd: 80, int: 92 },
+    lore: '케이스 인터뷰 전문 보스. 구조적 사고가 유일한 무기. 프레임워크 완전 정복 필수.' },
+  { id: 'govt', name: '공공기관/정부', short: 'GOV', industry: '공공 부문', rank: 'normal', hp: 55,
+    stats: { atk: 50, def: 90, spd: 30, int: 60 },
+    lore: '느리지만 안정적. 프로세스 준수와 규정 지식이 핵심 전략.' },
+];
+
+const RANK_COLORS = {
+  easy: '#3fb950',
+  normal: '#58a6ff',
+  hard: '#f2cc60',
+  nightmare: '#f85149'
+};
+
+const RANK_NAMES = {
+  easy: '쉬움', normal: '보통', hard: '어려움', nightmare: '악몽'
+};
+
+let selectedBoss = null;
+let activatedSkills = new Set();
+
+// ============ CLOCK ============
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toTimeString().slice(0,8) + ' JST';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ============ SCROLL ANIMATIONS ============
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
+
+// ============ BOSS GRID ============
+function renderBosses() {
+  const grid = document.getElementById('bossGrid');
+  const sel = document.getElementById('bossSelect');
+  grid.innerHTML = '';
+  sel.innerHTML = '<option value="">— 위에서 선택한 보스 자동 적용 —</option>';
+
+  BOSSES.forEach(boss => {
+    const card = document.createElement('div');
+    card.className = `boss-card ${boss.rank}`;
+    card.dataset.id = boss.id;
+
+    const color = RANK_COLORS[boss.rank];
+    const isNight = boss.rank === 'nightmare';
+
+    card.innerHTML = `
+      <div class="boss-card-inner">
+        <div class="boss-rank-wrap">
+          <span class="boss-rank ${boss.rank}">${RANK_NAMES[boss.rank]}</span>
+          ${isNight ? '<span class="warning-tag">⚠ CLASSIFIED</span>' : ''}
+        </div>
+        <div class="boss-logo">${boss.short}</div>
+        <div class="boss-name">${boss.name} // ${boss.industry}</div>
+        <p class="boss-lore">${boss.lore}</p>
+        <div class="boss-hp-section">
+          <div class="boss-hp-label">
+            <span>RISK LEVEL</span>
+            <span style="color:${color}; font-weight:bold;">${boss.hp} / 100</span>
+          </div>
+          <div class="boss-hp-track"><div class="boss-hp-fill"></div></div>
+        </div>
+        <div class="boss-stats">
+          <div class="boss-stat">
+            <div class="boss-stat-name">TECH ATK</div>
+            <div class="boss-stat-val">${boss.stats.atk}</div>
+          </div>
+          <div class="boss-stat">
+            <div class="boss-stat-name">PROCESS DEF</div>
+            <div class="boss-stat-val">${boss.stats.def}</div>
+          </div>
+          <div class="boss-stat">
+            <div class="boss-stat-name">AGILITY</div>
+            <div class="boss-stat-val">${boss.stats.spd}</div>
+          </div>
+          <div class="boss-stat">
+            <div class="boss-stat-name">INTEL REQ</div>
+            <div class="boss-stat-val">${boss.stats.int}</div>
+          </div>
+        </div>
+        <button class="boss-attack-btn">[ TARGET THIS ]</button>
+      </div>
+    `;
+
+    card.querySelector('.boss-attack-btn').addEventListener('click', () => selectBoss(boss));
+    card.addEventListener('click', (e) => {
+       if (e.target.tagName !== 'BUTTON') selectBoss(boss);
+    });
+    grid.appendChild(card);
+
+    const opt = document.createElement('option');
+    opt.value = boss.id;
+    opt.textContent = `[${RANK_NAMES[boss.rank]}] ${boss.name}`;
+    sel.appendChild(opt);
+  });
+}
+
+function selectBoss(boss) {
+  selectedBoss = boss;
+  document.querySelectorAll('.boss-card').forEach(c => c.classList.remove('selected'));
+  const card = document.querySelector(`.boss-card[data-id="${boss.id}"]`);
+  
+  const bar = document.getElementById('selectedBossBar');
+  bar.classList.add('active');
+  document.getElementById('selectedBossName').textContent = boss.name;
+  
+  const rb = document.getElementById('selectedBossRank');
+  rb.className = `boss-rank ${boss.rank}`;
+  rb.textContent = RANK_NAMES[boss.rank];
+  
+  document.getElementById('bossSelect').value = boss.id;
+  showNotif(`TARGET LOCKED: ${boss.name}`);
+
+  setTimeout(() => {
+    document.getElementById('analysis').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 500);
+}
+
+function clearBoss() {
+  selectedBoss = null;
+  document.getElementById('selectedBossBar').classList.remove('active');
+  document.getElementById('bossSelect').value = '';
+  showNotif("TARGET RELEASED");
+}
+
+// ============ SKILLS ============
+function toggleSkill(el) {
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) activatedSkills.add(el.textContent);
+  else activatedSkills.delete(el.textContent);
+}
+
+// ============ NOTIFICATION ============
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+// ============ LOADING MESSAGES ============
+const loadingMessages = [
+  'SCANNING BOSS DATA DATABASE...',
+  'ANALYZING PLAYER STATS CURVE...',
+  'CALCULATING SURVIVAL PROBABILITY...',
+  'MAPPING ATTACK PATTERNS...',
+  'GENERATING COMBAT STRATEGY...'
+];
+let loadMsgIdx = 0;
+let loadInterval;
+
+function startLoadingCycle() {
+  loadMsgIdx = 0;
+  document.getElementById('loadingText').textContent = loadingMessages[0];
+  loadInterval = setInterval(() => {
+    loadMsgIdx = (loadMsgIdx + 1) % loadingMessages.length;
+    document.getElementById('loadingText').textContent = loadingMessages[loadMsgIdx];
+  }, 1000);
+}
+function stopLoadingCycle() {
+  clearInterval(loadInterval);
+}
+
+// ============ ANALYSIS ============
+async function runAnalysis() {
+  const bossIdOverride = document.getElementById('bossSelect').value;
+  let boss = selectedBoss;
+  if (bossIdOverride) boss = BOSSES.find(b => b.id === bossIdOverride) || boss;
+
+  const major = document.getElementById('major').value.trim();
+  const experience = document.getElementById('experience').value;
+  const portfolio = document.getElementById('portfolio').value.trim();
+  const personality = document.getElementById('personality').value.trim();
+  const customSkills = document.getElementById('customSkills').value.trim();
+  const skills = [...activatedSkills, ...(customSkills ? customSkills.split(',').map(s=>s.trim()) : [])];
+
+  if (!boss && !bossIdOverride) {
+    showNotif('먼저 목표 보스를 선택하세요');
+    document.getElementById('bosses').scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+  if (skills.length === 0 && !major) {
+    showNotif('플레이어 스탯(전공 또는 스킬)을 입력하세요');
+    return;
+  }
+
+  if (!boss) boss = BOSSES.find(b => b.id === bossIdOverride) || BOSSES[0];
+
+  document.getElementById('resultIdle').style.display = 'none';
+  document.getElementById('resultContent').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'flex';
+  startLoadingCycle();
+
+  const result = generateLocalAnalysis({ boss, major, experience, skills, portfolio, personality });
+
+  setTimeout(() => {
+    stopLoadingCycle();
+    document.getElementById('loadingState').style.display = 'none';
+    renderResult(boss, result);
+    if(window.innerWidth < 1000) {
+        document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth' });
+    }
+  }, 1800);
+}
+
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+function uniq(arr) { return [...new Set(arr)].filter(Boolean); }
+
+function generateLocalAnalysis({ boss, major, experience, skills, portfolio, personality }) {
+  const skillText = skills.join(' ').toLowerCase();
+  const majorText = (major || '').toLowerCase();
+  const portfolioText = (portfolio || '').toLowerCase();
+  const personalityText = (personality || '').toLowerCase();
+  const allText = `${skillText} ${majorText} ${portfolioText} ${personalityText}`;
+
+  const expScoreMap = { student: 18, junior: 38, mid: 64, senior: 82 };
+  const expLabelMap = { student: '학생/신입', junior: '주니어', mid: '미드레벨', senior: '시니어' };
+  const rankPenalty = { easy: 4, normal: 18, hard: 34, nightmare: 48 }[boss.rank];
+
+  const techKeywords = ['python','javascript','react','sql','ml','ai','aws','cloud','devops','github','figma','ui','ux','데이터','분석','기획','프론트','백엔드','디자인','java','c++','kotlin','swift','go','docker','kubernetes'];
+  const commKeywords = ['커뮤니케이션','협력','발표','팀','리더','소통','친화','문서','글쓰기','pt','협상'];
+  const leadershipKeywords = ['리더','pm','기획','관리','운영','주도','팀장','책임','멘토링','agile','scrum'];
+  const portfolioKeywords = ['github','깃허브','notion','노션','figma','피그마','프로젝트','앱','웹','서비스','포트폴리오','배포','런칭','구현','클론'];
+
+  const hit = (list) => list.reduce((sum, k) => sum + (allText.includes(k) ? 1 : 0), 0);
+  const techHits = hit(techKeywords);
+  const commHits = hit(commKeywords);
+  const leadHits = hit(leadershipKeywords);
+  const portHits = hit(portfolioKeywords) + Math.min(5, Math.floor((portfolio || '').length / 100));
+
+  let tech = clamp(25 + techHits * 7 + skills.length * 3.5, 10, 98);
+  let communication = clamp(30 + commHits * 12 + (personality ? 10 : 0), 15, 96);
+  let experienceScore = clamp(expScoreMap[experience] + portHits * 5, 5, 99);
+  let culture = clamp(40 + (personality ? 15 : 0) + commHits * 6 + (portfolio ? 5 : 0), 15, 97);
+  let leadership = clamp(20 + leadHits * 15 + (experience === 'mid' ? 15 : 0) + (experience === 'senior' ? 30 : 0), 5, 98);
+
+  if (boss.industry.includes('AI')) tech += (allText.includes('ai') || allText.includes('ml') ? 12 : -8);
+  if (boss.industry.includes('컨설팅')) { communication += 10; leadership += 8; tech -= 5; }
+  if (boss.industry.includes('스타트업')) { culture += 10; leadership += 5; experienceScore += 5; }
+  if (boss.industry.includes('공공')) { culture += 8; tech -= 5; }
+  
+  tech = clamp(tech, 5, 99); communication = clamp(communication, 5, 99); experienceScore = clamp(experienceScore, 5, 99); culture = clamp(culture, 5, 99); leadership = clamp(leadership, 5, 99);
+
+  const weighted = tech * 0.35 + communication * 0.15 + experienceScore * 0.25 + culture * 0.15 + leadership * 0.10;
+  const humanFactor = (Math.random() - 0.5) * 6;
+  const survivalRate = Math.round(clamp(weighted - rankPenalty + (skills.length >= 6 ? 5 : 0) + (portfolio ? 8 : -5) + humanFactor, 5, 95));
+  
+  const difficultyMatch = survivalRate >= 75 ? '압도적 유리' : survivalRate >= 55 ? '적정 도전' : survivalRate >= 35 ? '전력 부족' : '불가능에 도전';
+
+  const weaknesses = [];
+  if (tech < boss.stats.atk * 0.7) weaknesses.push('상대의 기술적 질문 격파를 위한 핵심 직무 화력이 부족합니다.');
+  if (experienceScore < boss.stats.def * 0.6) weaknesses.push('실무 경험 증거(포트폴리오)가 약해 상대의 방어를 뚫기 어렵습니다.');
+  if (communication < 60) weaknesses.push('논리적 설득력 스탯이 낮아 면접관과의 주도권 싸움에서 밀릴 수 있습니다.');
+  if (['hard','nightmare'].includes(boss.rank) && leadership < 60) weaknesses.push('고난도 보스는 주도성과 문제해결력을 검증하는 강력한 패턴을 사용합니다.');
+  if (!portfolio || portfolio.length < 50) weaknesses.push('전투 장비(포트폴리오 구체성)가 제대로 갖춰지지 않았습니다.');
+  while (weaknesses.length < 3) weaknesses.push('기업 맞춤형 전략 수립이 부족하여 안정성이 떨어집니다.');
+
+  const strengths = [];
+  if (tech >= 70) strengths.push('직무 기술 스탯이 훌륭하여 기술 면접 라운드에서 우위를 점합니다.');
+  if (portfolio && portfolio.length > 200) strengths.push('풍부한 프로젝트 실질 경험이 강력한 방어기제가 됩니다.');
+  if (communication >= 70) strengths.push('뛰어난 소통 능력으로 인성/컬처핏 면접에서 가산점을 얻습니다.');
+  if (culture >= boss.stats.int * 0.7) strengths.push('기업이 추구하는 인재상과 성격 특성의 싱크로율이 높습니다.');
+  while (strengths.length < 3) strengths.push(`${expLabelMap[experience]} 레벨에 부합하는 안정적인 스탯 분배를 가졌습니다.`);
+
+  let recommendedSkills = ['면접 STAR 답변 구조화', '포트폴리오 스토리텔링 임팩트', '기업 핵심 가치 분석'];
+  if (boss.industry.includes('AI')) recommendedSkills.unshift('최신 LLM 논문 리뷰', 'AI 윤리/안전성 프로젝트');
+  else if (boss.industry.includes('테크')) recommendedSkills.unshift('대규모 시스템 설계 기초', '자료구조/알고리즘 심화');
+  else if (boss.industry.includes('컨설팅')) recommendedSkills.unshift('비즈니스 케이스 스터디', '로지컬 싱킹 프레임워크');
+  else recommendedSkills.unshift('실무 기술 스택 심화 프로젝트', '직무 관련 인턴십/협업 경험');
+  recommendedSkills = uniq(recommendedSkills).slice(0, 4);
+
+  const expectedQuestions = [
+    `왜 다른 빅테크가 아닌 ${boss.name}이어야만 합니까? (지원동기 공격)`,
+    `프로젝트에서 기술적 한계에 부딪혔을 때 어떻게 해결했나요? (문제해결력 공격)`,
+    `팀 내에서 의견이 극명하게 갈릴 때 어떻게 대처했습니까? (협업 능력 심문)`,
+    `본인의 기술적 약점은 무엇이며 어떻게 보완하고 있습니까? (자기객관화 검증)`
+  ];
+
+  const overallAssessment = survivalRate >= 75
+    ? `승리가 눈앞에 보입니다. ${boss.name}의 공격 패턴에 맞춘 최종 점검만 끝내면 충분히 합격 가능합니다. 자만하지 말고 증거(STAR) 기반 답변을 다듬으세요.`
+    : survivalRate >= 55
+      ? `${boss.name}전은 해볼 만한 전투입니다. 다만 승리를 위해서는 포트폴리오의 구체적 성과를 수치화하고, 면접 답변의 논리를 강화하는 레벨업이 필요합니다.`
+      : `${boss.name}전은 현재 스탯으로는 매우 고전할 것으로 예상되는 하드코어 매치입니다. 핵심 직무 스킬과 프로젝트 경험을 집중적으로 보완한 뒤 도전하는 것을 권장합니다.`;
+
+  const battleTip = survivalRate >= 50
+    ? '상대의 공격(질문) 의도를 파악하고, 본인의 강점 스탯(경험)으로 역공을 펼치세요.'
+    : '지금은 전면전보다 레벨업(스펙 쌓기)이 우선입니다. 작은 사이드 프로젝트부터 완성해보세요.';
+
+  return {
+    survivalRate, difficultyMatch, overallAssessment, weaknesses: weaknesses.slice(0,3),
+    strengths: strengths.slice(0,3), recommendedSkills, expectedQuestions, battleTip,
+    stats: { '기술력': tech, '소통능력': communication, '경험치': experienceScore, '문화적합성': culture, '리더십': leadership }
+  };
+}
+
+function renderResult(boss, r) {
+  const rankColor = RANK_COLORS[boss.rank];
+  const hue = clamp(r.survivalRate * 1.2, 0, 120); 
+  const survColor = `hsl(${hue}, 80%, 60%)`;
+
+  const content = document.getElementById('resultContent');
+  content.style.display = 'block';
+
+  content.innerHTML = `
+    <div class="result-header">
+      <div>
+        <div class="survival-rate-wrap">
+            <div class="survival-rate" style="color:${survColor}">${r.survivalRate}</div>
+            <div class="percent-symbol">%</div>
+        </div>
+        <div class="survival-label">ESTIMATED SURVIVAL CHANCE</div>
+      </div>
+      <div style="text-align:right">
+        <div class="difficulty-badge" style="color:${rankColor}; border:1px solid ${rankColor}80; background:${rankColor}10">${r.difficultyMatch}</div>
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--dim); margin-top:8px; letter-spacing:1px">VS ${boss.name.toUpperCase()}</div>
+      </div>
+    </div>
+
+    <div class="result-section">
+      <div class="result-section-title">// 전술 종합 평가</div>
+      <p class="result-text">${r.overallAssessment}</p>
+    </div>
+
+    <div class="result-section">
+      <div class="result-section-title">// 플레이어 분석 스탯</div>
+      <div class="stat-bars" id="statBars">
+        ${Object.entries(r.stats).map(([k,v]) => `
+          <div class="stat-row">
+            <div class="stat-row-name">${k}</div>
+            <div class="stat-bar-track"><div class="stat-bar-fill" data-val="${v}" style="background:${survColor}"></div></div>
+            <div class="stat-row-val">${v}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:35px">
+      <div class="result-section" style="margin-bottom:0">
+        <div class="result-section-title" style="color:var(--neon-red)">// 주요 약점 (CRITICAL)</div>
+        <ul class="result-list">
+          ${r.weaknesses.map(w => `<li style="border-left-color:var(--neon-red); background:rgba(248,81,73,0.03)">${w}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="result-section" style="margin-bottom:0">
+        <div class="result-section-title" style="color:var(--neon-green)">// 보유 강점 (ADVANTAGE)</div>
+        <ul class="result-list">
+          ${r.strengths.map(s => `<li style="border-left-color:var(--neon-green); background:rgba(63,185,80,0.03)">${s}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <div class="result-section">
+      <div class="result-section-title">// 습득 권장 전술 (SKILLS)</div>
+      <ul class="result-list">
+        ${r.recommendedSkills.map(s => `<li>${s}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="result-section">
+      <div class="result-section-title">// 예상 보스 공격 패턴 (QUESTIONS)</div>
+      <ul class="result-list">
+        ${r.expectedQuestions.map(q => `<li style="font-family:var(--font-main); font-weight:500; color:var(--text-bold)">${q}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:10px">
+      <div style="font-family:var(--font-orbit); font-size:12px; color:var(--neon-blue); letter-spacing:2px; margin-bottom:8px; text-transform:uppercase">COMBAT TIP</div>
+      <p style="font-family:var(--font-main); font-size:14px; color:var(--text-main); line-height:1.6">⚔ ${r.battleTip}</p>
+    </div>
+
+    <button onclick="runAnalysis()" class="btn-secondary" style="margin-top:30px; border-color:var(--dim); color:var(--dim);">
+      [ RE-ANALYZE SYSTEM ]
+    </button>
+  `;
+
+  setTimeout(() => {
+    document.querySelectorAll('#statBars .stat-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.val + '%';
+    });
+  }, 100);
+
+  showNotif(`분석 완료: 생존 확률 ${r.survivalRate}%`);
+}
+
+// ============ INTERVIEW BOSS BATTLE MODE ============
+const INTERVIEW_QUESTIONS = {
+  tech: [
+    '가장 도전적이었던 프로젝트 경험과 그 안에서 본인의 기술적 기여도를 STAR 구조로 설명해주세요.',
+    '사용해보신 기술 스택 중 하나를 골라, 왜 그 기술을 선택했는지 장단점을 비교하여 설명해주세요.',
+    '팀 프로젝트 중 기술적인 의견 충돌이 있었을 때, 어떻게 논리적으로 설득하여 해결했나요?',
+    '최신 기술 트렌드 중 지원하신 직무와 관련하여 가장 인상 깊게 본 것은 무엇이며, 본인 실무에 어떻게 적용해보고 싶나요?'
+  ],
+  ai: [
+    'AI 모델의 성능과 실제 서비스 적용 시의 레이턴시(Latency) 사이에서 트레이드오프를 해결해본 경험이 있나요?',
+    '데이터 편향성(Bias) 문제를 인지하고 이를 해결하기 위해 노력해본 경험이나 본인만의 접근 방식이 있다면 설명해주세요.',
+    '가장 완성도 높게 구현해본 AI/ML 프로젝트의 전 과정을 문제 정의부터 결과 도출까지 설명해주세요.',
+    '생성형 AI 기술이 급변하는 상황에서, 본인만의 기술 습득 노하우와 커리어적 성장 계획은 무엇인가요?'
+  ],
+  consulting: [
+    '최근 발생한 비즈니스 이슈 중 하나를 선정하여, 본인만의 프레임워크로 구조화하고 해결 방안을 제시해주세요.',
+    '제한된 정보와 시간 내에 중요한 의사결정을 내려야 했던 경험과 그 결과에 대해 말해주세요.',
+    '이해관계자가 복잡하게 얽힌 프로젝트를 수행하면서 갈등을 조정하고 목표를 달성해본 경험이 있나요?',
+    '지원자께서 생각하시는 "통찰력(Insight)"이란 무엇이며, 본인의 경험 중 통찰력을 발휘한 사례를 말해주세요.'
+  ],
+  public: [
+    '공공기관 직원으로서 가장 중요하게 갖추어야 할 덕목과, 본인이 그 덕목에 어떻게 부합하는지 경험을 들어 말해주세요.',
+    '업무 수행 중 규정과 효율성이 충돌하는 상황이 발생한다면 어떻게 대처하시겠습니까?',
+    '다양한 민원인의 요구사항을 경청하고, 갈등을 원만하게 해결해본 경험이 있다면 설명해주세요.',
+    '조직의 목표를 위해 개인의 희생을 감수하거나, 주도적으로 책임을 다해 성과를 내본 경험이 있나요?'
+  ],
+  general: [
+    '지원하신 직무와 관련하여 본인만의 차별화된 핵심 경쟁력은 무엇이며, 이를 입증할 구체적 사례를 들려주세요.',
+    '살면서 가장 큰 성취감을 느꼈던 경험과 그 과정에서 배운 점은 무엇인가요?',
+    '본인이 생각하는 이상적인 팀워크는 무엇이며, 팀 내에서 본인은 주로 어떤 역할을 수행하나요?',
+    '입사 후 5년 뒤, ${boss.name} 내에서 어떤 구체적인 리더십이나 전문성을 발휘하는 인재로 성장하고 싶나요?'
+  ]
+};
+
+let battleState = {
+  active: false, boss: null, hp: 100, maxHp: 100, round: 0,
+  maxRounds: 4, totalScore: 0, scores: [], grades: [], questions: []
+};
+
+function getBattleBoss() {
+  const bossIdOverride = document.getElementById('bossSelect')?.value;
+  return selectedBoss || BOSSES.find(b => b.id === bossIdOverride) || null;
+}
+
+function getQuestionSet(boss) {
+  if (!boss) return INTERVIEW_QUESTIONS.general;
+  if (boss.industry.includes('AI')) return INTERVIEW_QUESTIONS.ai;
+  if (boss.industry.includes('컨설팅')) return INTERVIEW_QUESTIONS.consulting;
+  if (boss.industry.includes('공공')) return INTERVIEW_QUESTIONS.public;
+  if (boss.industry.includes('테크') || boss.industry.includes('클라우드') || boss.industry.includes('핀테크')) return INTERVIEW_QUESTIONS.tech;
+  return INTERVIEW_QUESTIONS.general;
+}
+
+function startInterviewBattle() {
+  const boss = getBattleBoss();
+  if (!boss) {
+    showNotif('먼저 보스를 선택하세요');
+    document.getElementById('bosses').scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+  const questions = getQuestionSet(boss);
+  battleState = {
+    active: true, boss, hp: 100, maxHp: 100, round: 0,
+    maxRounds: questions.length, totalScore: 0, scores: [], grades: [],
+    questions: questions.map(q => q.replace('${boss.name}', boss.name))
+  };
+  
+  document.getElementById('battleBossName').textContent = boss.short;
+  document.getElementById('battleBossName').style.color = RANK_COLORS[boss.rank];
+  
+  const rankName = RANK_NAMES[boss.rank];
+  document.getElementById('battleBossInfo').innerHTML = `${boss.name} // ${boss.industry} // RISK: <span style="color:${RANK_COLORS[boss.rank]}">${rankName}</span>`;
+  
+  document.getElementById('attackBtn').disabled = false;
+  document.getElementById('battleAnswer').value = '';
+  document.getElementById('battleAnswer').focus();
+  document.getElementById('battleFinalResult').style.display = 'none';
+  document.getElementById('finalScoreMini').textContent = '-';
+  
+  const log = document.getElementById('battleLog');
+  log.innerHTML = `<div class="log-line bad">[SYSTEM ALERT] 보스 ${boss.name}이(가) 면접장에 등장했습니다. 전투가 시작됩니다.</div>`;
+  
+  updateBattleUI();
+  nextBattleQuestion();
+  showNotif('면접 보스전 전투 시작');
+  if(window.innerWidth < 1100) {
+    document.getElementById('interviewBattle').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function resetInterviewBattle() {
+  if (battleState.active && !confirm("전투 중입니다. 정말 리셋하시겠습니까?")) return;
+  
+  battleState.active = false;
+  battleState.hp = 100;
+  battleState.round = 0;
+  battleState.totalScore = 0;
+  battleState.scores = [];
+  battleState.grades = [];
+  
+  document.getElementById('battleBossName').textContent = 'NO TARGET';
+  document.getElementById('battleBossName').style.color = 'var(--text-bold)';
+  document.getElementById('battleBossInfo').textContent = '먼저 보스를 선택한 뒤 전투를 시작하세요.';
+  document.getElementById('battleQuestion').textContent = '보스전을 시작하면 질문이 나타납니다.';
+  document.getElementById('battlePhase').textContent = 'PHASE 00';
+  document.getElementById('battleAnswer').value = '';
+  document.getElementById('attackBtn').disabled = true;
+  document.getElementById('finalScoreMini').textContent = '-';
+  document.getElementById('lastDamage').textContent = '0';
+  document.getElementById('lastGrade').textContent = '-';
+  document.getElementById('battleFinalResult').style.display = 'none';
+  
+  document.getElementById('battleLog').innerHTML = `
+    <div class="log-line">[SYSTEM] 보스전 대기 중. 보스를 선택하고 전투 시작을 누르세요.</div>
+    <div class="log-line">[TIP] 좋은 답변 = 상황 + 행동 + 결과 + 배운 점 + 직무 연결.</div>
+  `;
+  updateBattleUI();
+  showNotif("COMBAT RESET");
+}
+
+function nextBattleQuestion() {
+  if (!battleState.active) return;
+  const q = battleState.questions[battleState.round];
+  if (q) {
+    document.getElementById('battlePhase').textContent = `PHASE ${String(battleState.round + 1).padStart(2, '0')} // ${String(battleState.maxRounds).padStart(2, '0')}`;
+    document.getElementById('battleQuestion').textContent = q;
+  }
+}
+
+function submitBattleAnswer() {
+  if (!battleState.active) return;
+  const answer = document.getElementById('battleAnswer').value.trim();
+  if (answer.length < 30) {
+    showNotif('답변이 너무 짧습니다 (최소 30자)');
+    addBattleLog('[CRITICAL MISS] 답변이 너무 짧아 상대에게 전혀 데미지를 주지 못했습니다. 구체적인 경험을 보강하세요.', 'bad');
+    return;
+  }
+
+  const result = scoreBattleAnswer(answer, battleState.boss);
+  battleState.hp = clamp(battleState.hp - result.damage, 0, battleState.maxHp);
+  battleState.scores.push(result.score);
+  battleState.grades.push(result.grade);
+  battleState.totalScore = Math.round(battleState.scores.reduce((a, b) => a + b, 0) / battleState.scores.length);
+  battleState.round += 1;
+
+  document.getElementById('lastDamage').textContent = result.damage;
+  document.getElementById('lastGrade').textContent = result.grade;
+  document.getElementById('finalScoreMini').textContent = battleState.totalScore;
+  
+  const gradeClass = (result.grade === 'S' || result.grade === 'A') ? 'good' : (result.grade === 'B') ? 'mid' : 'bad';
+  addBattleLog(`[ROUNT ${battleState.round}] 당신의 답변 평가: ${result.grade} GRADE // 상대 HP ${result.damage} 감소.`, gradeClass);
+  addBattleLog(`[ANALYSIS] ${result.feedback}`, gradeClass);
+
+  document.getElementById('battleAnswer').value = '';
+  document.getElementById('battleAnswer').focus();
+  updateBattleUI();
+
+  if (battleState.round >= battleState.maxRounds) {
+    finishInterviewBattle();
+  } else {
+    nextBattleQuestion();
+  }
+}
+
+function finishInterviewBattle() {
+  battleState.active = false;
+  document.getElementById('attackBtn').disabled = true;
+  document.getElementById('battleQuestion').textContent = '면접 전투가 종료되었습니다.';
+  document.getElementById('battlePhase').textContent = 'COMBAT COMPLETE';
+
+  const finalScore = battleState.totalScore || 0;
+  
+  let rank, comment, color;
+  if (finalScore >= 90) {
+     rank = 'S RANK // 최종 합격 유력';
+     comment = '완벽에 가까운 전투였습니다. STAR 구조, 수치적 성과, 기업 가치 연결까지 모든 답변이 임팩트 있었습니다.';
+     color = 'var(--neon-green)';
+  } else if (finalScore >= 80) {
+     rank = 'A RANK // 합격 가능성 높음';
+     comment = '훌륭한 전투였습니다. 전반적으로 구체적이고 설득력 있는 답변이었으나, 일부 질문에서 조금 더 수치화된 성과를 보여주었다면 좋았을 것입니다.';
+     color = 'var(--neon-blue)';
+  } else if (finalScore >= 65) {
+     rank = 'B RANK // 보완 후 재도전 권장';
+     comment = '답변의 의도는 좋았으나, 면접관에게 결정타를 날리기엔 구체성이 다소 부족했습니다. 경험의 STAR 구조를 다시 점검하고 수치적 근거를 보강하세요.';
+     color = 'var(--neon-gold)';
+  } else {
+     rank = 'C RANK // 기본 스탯 레벨업 필요';
+     comment = '상대의 공격에 제대로 방어하지 못했습니다. 답변이 추상적이고 직무와의 연관성이 떨어집니다. 포트폴리오 스펙 자체를 높이거나 답변 구조화 연습이 시급합니다.';
+     color = 'var(--neon-red)';
+  }
+
+  document.getElementById('finalInterviewScore').textContent = `${finalScore}`;
+  document.getElementById('finalInterviewScore').style.color = color;
+  document.getElementById('finalInterviewRank').textContent = rank;
+  document.getElementById('finalInterviewRank').style.color = color;
+  document.getElementById('finalInterviewComment').textContent = comment;
+  document.getElementById('battleFinalResult').style.display = 'block';
+  
+  addBattleLog(`[SYSTEM] 면접 종료. 최종 평가 점수: ${finalScore}점 // ${rank}`, (finalScore >= 80 ? 'good' : (finalScore >= 65 ? 'mid' : 'bad')));
+  showNotif(`면접 종료. 최종 점수: ${finalScore}점`);
+  
+  if(window.innerWidth < 1100) {
+    document.getElementById('battleLog').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function scoreBattleAnswer(answer, boss) {
+  const text = answer.toLowerCase();
+  let score = 0;
+  score += Math.min(20, Math.floor(answer.length / 30));
+
+  const countHits = (regex) => (answer.match(regex) || []).length;
+  
+  if (/(상황|배경|당시|상태)/.test(text)) score += 5;
+  if (/(역할|담당|목표|과제)/.test(text)) score += 5;
+  if (/(행동|구현|개발|기획|노력|수행|분석|해결|조정)/.test(text)) score += 10;
+  if (/(결과|성과|성취|달성|배운점|느낀점|개선)/.test(text)) score += 10;
+  
+  const numHits = countHits(/\d+%?|(백만|천만|억|건|명|배)/g);
+  score += Math.min(15, numHits * 3);
+  
+  if (new RegExp(boss.name.toLowerCase() + '|가치|이념|문화|공헌|기여|지원동기', 'i').test(text)) score += 8;
+  if (/(직무|역량|전문성|기대)/.test(text)) score += 7;
+  
+  if (/(첫째|우선|무엇보다|마지막으로|결론적으로|따라서)/.test(text)) score += 5;
+  if (/(왜냐하면|덕분에|통해)/.test(text)) score += 5;
+
+  const rankGuard = { easy: 0, normal: 5, hard: 12, nightmare: 20 }[boss.rank];
+  
+  let answerScore = clamp(Math.round(score * 1.3) - rankGuard, 30, 100);
+  
+  const damageBase = answerScore / 3;
+  const variance = (Math.random() * 0.4 + 0.8);
+  let damage = clamp(Math.round(damageBase * variance), 5, 35);
+  
+  let grade = answerScore >= 90 ? 'S' : answerScore >= 80 ? 'A' : answerScore >= 65 ? 'B' : answerScore >= 50 ? 'C' : 'D';
+  
+  let feedback = '추상적인 표현이 많습니다. 구체적인 경험, 본인의 역할, 그리고 수치적 결과를 STAR 구조로 정리하세요.';
+  if (grade === 'S') feedback = '완벽합니다! 상황 제시부터 본인의 주도적 행동, 그리고 명확한 결과까지 완벽한 구조를 갖췄습니다.';
+  else if (grade === 'A') feedback = '훌륭한 답변입니다. 본인의 강점이 잘 드러났습니다. 결과의 수치적 근거를 조금 더 보강하면 완벽해질 것입니다.';
+  else if (grade === 'B') feedback = '답변의 방향은 맞으나, 면접관에게 주는 임팩트가 약합니다. 행동(Action)과 결과(Result) 부분을 더 구체화하세요.';
+  else if (grade === 'C') feedback = '질문의 핵심을 파악했으나 답변이 장황하거나 근거가 부족합니다. 핵심 역량 중심으로 단순명료하게 다듬으세요.';
+  
+  return { score: answerScore, damage, grade, feedback };
+}
+
+function updateBattleUI() {
+  const hp = battleState.hp ?? 100;
+  document.getElementById('bossHpText').textContent = `${hp} / 100`;
+  document.getElementById('bossHpFill').style.width = `${hp}%`;
+  document.getElementById('battleRound').textContent = battleState.round ?? 0;
+  
+  if(hp <= 30) {
+    document.getElementById('bossHpFill').style.background = 'var(--neon-red)';
+  } else if(hp <= 60) {
+    document.getElementById('bossHpFill').style.background = 'var(--neon-gold)';
+  } else {
+    document.getElementById('bossHpFill').style.background = 'linear-gradient(90deg, var(--neon-red), #ff7a29)';
+  }
+}
+
+function addBattleLog(message, type='') {
+  const log = document.getElementById('battleLog');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  line.textContent = message;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+// ============ INIT ============
+renderBosses();
+</script>
+</body>
+</html>
